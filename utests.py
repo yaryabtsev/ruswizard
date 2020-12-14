@@ -145,6 +145,21 @@ class RuswizardTestLogin(unittest.TestCase):
         self.assertEqual(self.test.add_img(), True)
         self.assertNotEqual(type(self.test.submit()), type(True))
 
+    def test_add_title_0(self):
+        self.assertEqual(self.test.new_post(), True)
+        self.assertEqual(self.test.add_title(), True)
+        self.assertNotEqual(type(self.test.submit()), type(True))
+
+    def test_add_quote_0(self):
+        self.assertEqual(self.test.new_post(), True)
+        self.assertEqual(self.test.add_quote(), True)
+        self.assertNotEqual(type(self.test.submit()), type(True))
+
+    def test_add_block_0(self):
+        self.assertEqual(self.test.new_post(), True)
+        self.assertEqual(self.test.add_block(), True)
+        self.assertNotEqual(type(self.test.submit()), type(True))
+
 
 if __name__ == '__main__':
     unittest.main()

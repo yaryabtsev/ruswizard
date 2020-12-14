@@ -5,6 +5,7 @@ from hashlib import sha256
 from time import sleep
 
 from selenium.webdriver import Firefox
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 
@@ -99,6 +100,32 @@ class Ruswizard():
         if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
                                   'Редактировать запись ‹ Testing example — WordPress']:
             self.browser.find_element_by_xpath('//button[contains(@aria-label, "Добавить блок")]').click()
+            self.browser.find_element_by_xpath('//button[contains(@class, "block-editor-block-types-list__'
+                                               'item editor-block-list-item-heading")]').click()
+            self.browser.switch_to.active_element.send_keys("New Title")
+            return True
+        return False
+
+    def add_quote(self):
+        if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
+                                  'Редактировать запись ‹ Testing example — WordPress']:
+            self.browser.find_element_by_xpath('//button[contains(@aria-label, "Добавить блок")]').click()
+            self.browser.find_element_by_xpath('//button[contains(@class, "block-editor-block-types-list__'
+                                               'item editor-block-list-item-quote")]').click()
+            elm = self.browser.switch_to.active_element
+            elm.send_keys("New Quote")
+            elm.send_keys(Keys.TAB)
+            self.browser.switch_to.active_element.send_keys("NoOne")
+            return True
+        return False
+
+    def add_block(self):
+        if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
+                                  'Редактировать запись ‹ Testing example — WordPress']:
+            self.browser.find_element_by_xpath('//button[contains(@aria-label, "Добавить блок")]').click()
+            self.browser.find_element_by_xpath('//button[contains(@class, "block-editor-block-types-list__'
+                                               'item editor-block-list-item-paragraph")]').click()
+            self.browser.switch_to.active_element.send_keys("New Paragraph")
             return True
         return False
 
