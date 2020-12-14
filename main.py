@@ -9,7 +9,7 @@ from selenium.webdriver.firefox.options import Options
 class Ruswizard():
     def __init__(self):
         self.opts = Options()
-        self.opts.set_headless()
+        # self.opts.set_headless()
         self.browser = Firefox(options=self.opts)
         self.authorized = False
 
@@ -41,6 +41,34 @@ class Ruswizard():
                                                     '"the-list")]//tr[contains(@id, "post-")]')
         return [post.text for post in posts]
 
+    def add_tokens(self, tokens=None):
+        if not tokens:
+            return False
+        if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
+            self.browser.find_element_by_id('post-title-0').click()
+            sleep(1)
+            if not self.browser.find_elements_by_xpath('//button[contains(@class, "edit-post-post-visibility")]'):
+                self.browser.find_element_by_xpath('//div[contains(@class, "interface-pinned-items")]'
+                                                   '//button[contains(@class, "has-icon")]').click()
+            xpath = '//input[contains(@id, "components-form-token-input-")]'
+            inpt = self.browser.find_elements_by_xpath(xpath)
+            _xpath = '//div[contains(@class, "components-panel__body")]' \
+                     '//h2[contains(@class, "components-panel__body-title")]' \
+                     '//button[contains(@class, "components-panel__body-toggle")]'
+            if not inpt:
+                self.browser.find_elements_by_xpath(_xpath)[0].click()
+                self.browser.find_elements_by_xpath(_xpath)[3].click()
+                inpt = self.browser.find_elements_by_xpath(xpath)
+            for token in tokens:
+                inpt[0].send_keys(str(token) + ',')
+            _xpath = '//div[contains(@class, "components-panel__body")]' \
+                     '//h2[contains(@class, "components-panel__body-title")]' \
+                     '//button[contains(@class, "components-panel__body-toggle")]'
+            self.browser.find_elements_by_xpath(_xpath)[3].click()
+            self.browser.find_elements_by_xpath(_xpath)[0].click()
+            return True
+        return False
+
     def visible(self, flag=True):
         if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
             self.browser.find_element_by_id('post-title-0').click()
@@ -65,8 +93,8 @@ class Ruswizard():
                 url = self.browser.find_elements_by_xpath(xpath)
                 if not url:
                     _xpath = '//div[contains(@class, "components-panel__body")]' \
-                        '//h2[contains(@class, "components-panel__body-title")]' \
-                        '//button[contains(@class, "components-panel__body-toggle")]'
+                             '//h2[contains(@class, "components-panel__body-title")]' \
+                             '//button[contains(@class, "components-panel__body-toggle")]'
                     self.browser.find_elements_by_xpath(_xpath)[0].click()
                     self.browser.find_elements_by_xpath(_xpath)[1].click()
                     url = self.browser.find_elements_by_xpath(xpath)
@@ -177,13 +205,14 @@ class Ruswizard():
 
     def submit(self):
         if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
+            title = self.browser.find_element_by_id('post-title-0').text
             self.browser.find_element_by_xpath(
                 '//button[contains(@class, "editor-post-publish-panel__toggle")]').click()
+            sleep(2)
             self.browser.find_element_by_xpath(
                 '//button[contains(@class, "components-button'
                 ' editor-post-publish-button editor-post-publish-button__button is-primary")]').click()
-            sleep(1)
-            title = self.browser.find_element_by_id('post-title-0').text
+            sleep(5)
             self.browser.find_element_by_link_text(title).click()
             return self.browser.current_url
         elif self.browser.title == 'Редактировать запись ‹ Testing example — WordPress':
@@ -246,12 +275,12 @@ class Ruswizard():
     def __del__(self):
         self.browser.quit()
 
-# if __name__ == "__main__":
-#     test = Ruswizard()
-#     print(test.log_in("ya", "12345"))
-#     print(test.new_post())
-#     print(test.visible(False))
-#     # print(test.submit())
-#     # sleep(100)
-#     print(test.log_out())
-#     del test
+
+if __name__ == "__main__":
+    test = Ruswizard()
+    print(test.log_in("ya", "12345"))
+    print(test.new_post())
+    print(test.add_tokens(['t1', 't2', 't3']))
+    print(test.submit())
+    print(test.log_out())
+    del test
