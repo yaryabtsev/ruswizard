@@ -1,5 +1,7 @@
 import random
+import re
 from datetime import datetime
+from hashlib import sha256
 from time import sleep
 
 from selenium.webdriver import Firefox
@@ -9,7 +11,7 @@ from selenium.webdriver.firefox.options import Options
 class Ruswizard():
     def __init__(self):
         self.opts = Options()
-        # self.opts.set_headless()
+        self.opts.set_headless()
         self.browser = Firefox(options=self.opts)
         self.authorized = False
 
@@ -66,6 +68,30 @@ class Ruswizard():
                      '//button[contains(@class, "components-panel__body-toggle")]'
             self.browser.find_elements_by_xpath(_xpath)[3].click()
             self.browser.find_elements_by_xpath(_xpath)[0].click()
+            return True
+        return False
+
+    def set_time(self, mins=1):
+        if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
+            self.browser.find_element_by_id('post-title-0').click()
+            sleep(1)
+            self.browser.find_element_by_xpath(
+                '//button[contains(@class, "editor-post-publish-panel__toggle")]').click()
+            sleep(1)
+            _xpath = '//div[contains(@class, "components-panel__body")]' \
+                     '//h2[contains(@class, "components-panel__body-title")]' \
+                     '//button[contains(@class, "components-panel__body-toggle")]'
+            blocks = self.browser.find_elements_by_xpath(_xpath)
+            for block in blocks:
+                if 'Опубликована:' in block.text:
+                    block.click()
+            inpt = self.browser.find_element_by_class_name('components-datetime__time-field-minutes-input')
+            curr_t = int(inpt.get_attribute('value'))
+            if curr_t + mins > 59:
+                return False
+            inpt.send_keys(str(curr_t + mins))
+            self.browser.find_element_by_xpath(
+                '//button[contains(@aria-label, "Закрыть панель")]').click()
             return True
         return False
 
@@ -203,18 +229,38 @@ class Ruswizard():
             return True
         return False
 
+    def append_body(self, text="*"):
+        if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
+                                  'Редактировать запись ‹ Testing example — WordPress']:
+            self.browser.find_elements_by_xpath(
+                '//div[contains(@class, "block-editor-block-list")]//p[contains(@id, "block-")]')[0].send_keys(text)
+            return True
+        return False
+
+    def edit_body(self, text=""):
+        if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
+                                  'Редактировать запись ‹ Testing example — WordPress']:
+            if not text:
+                text = '***' + sha256((str(datetime.utcnow()) + 'geek').encode('utf-8')).hexdigest()
+            self.browser.find_elements_by_xpath(
+                '//div[contains(@class, "block-editor-block-list")]//p[contains(@id, "block-")]')[0].clear()
+            self.append_body(text)
+            return True
+        return False
+
     def submit(self):
         if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
-            title = self.browser.find_element_by_id('post-title-0').text
             self.browser.find_element_by_xpath(
                 '//button[contains(@class, "editor-post-publish-panel__toggle")]').click()
-            sleep(2)
+            sleep(1)
             self.browser.find_element_by_xpath(
                 '//button[contains(@class, "components-button'
                 ' editor-post-publish-button editor-post-publish-button__button is-primary")]').click()
-            sleep(5)
-            self.browser.find_element_by_link_text(title).click()
-            return self.browser.current_url
+            sleep(2)
+            urls = re.findall(r'https://ruswizard.site/test/\d+/\d+/\d+/[^/]+', self.browser.page_source)
+            if not urls:
+                return False
+            return urls[0]
         elif self.browser.title == 'Редактировать запись ‹ Testing example — WordPress':
             self.browser.find_element_by_id('post-title-0').send_keys('*')
             self.browser.find_element_by_xpath(
@@ -280,7 +326,7 @@ if __name__ == "__main__":
     test = Ruswizard()
     print(test.log_in("ya", "12345"))
     print(test.new_post())
-    print(test.add_tokens(['t1', 't2', 't3']))
+    print(test.set_time(2))
     print(test.submit())
     print(test.log_out())
     del test
