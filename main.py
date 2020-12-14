@@ -95,6 +95,56 @@ class Ruswizard():
             return True
         return False
 
+    def add_title(self):
+        if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
+                                  'Редактировать запись ‹ Testing example — WordPress']:
+            self.browser.find_element_by_xpath('//button[contains(@aria-label, "Добавить блок")]').click()
+            return True
+        return False
+
+    def add_img(self):
+        if self.browser.title in ['Добавить запись ‹ Testing example — WordPress',
+                                  'Редактировать запись ‹ Testing example — WordPress']:
+            self.browser.find_element_by_xpath('//button[contains(@aria-label, "Добавить блок")]').click()
+            self.browser.find_element_by_xpath('//button[contains(@class, "block-editor-block-types-list__'
+                                               'item editor-block-list-item-image")]').click()
+            self.browser.find_element_by_xpath('//div[contains(@class, "block-editor-media-placeholder__'
+                                               'url-input-container")]//button[contains(@class,'
+                                               ' "block-editor-media-placeholder__button")]').click()
+            sleep(1)
+            inpt = self.browser.find_element_by_xpath(
+                '//input[contains(@placeholder, "Вставить или ввести URL-адрес")]')
+            inpt.click()
+            imgs = ['a8fca2352c62aaf357344c82473cf3af', 'c8c858b711f2a673a40bdb382f37f4ce',
+                    '0f9d19e62ed05bbc944e4db3488e3830', '9a7ebe12a5ad8c0135932540a6db56d5',
+                    '435ca34b2e72d906a799dd31499f1f7c', 'e6c122d6355d39a1ff927f645c79bd44',
+                    '42f32697d62d7ecdb00511cca15f49b7', '8e84667a056ac2e33f00c199a1816d33',
+                    '1153b4f0731f68fa9947f14002b85b98', '304526e1793bee54455323ffca624a83',
+                    '809c86905f2d07b2445dc3ea03e01c2b', '94277904ae3660128a01705064daad4b',
+                    'd6f02f1d62a9b368949f450b8707e472', '12fd44bb40f595df5adaff0054af6c4c',
+                    'ecdb753cc9cc5b3f9ac4d4f51ef5ed96', '4889f08b251652e456c99fef259a1061',
+                    'c4c952dbdc75df0a3ebd5f366c209ba7', '6da0d6192f744501d0c5613561472dba',
+                    '5f3b29ec02e432d8383cb878fa1ef025', '000b3efa4c995c65e70f25484a0944fc',
+                    '9c69efe1c78f8a5e91bba9edec08bcd1', '838acb5d2846e1334de4f9214984e614',
+                    'ad9bc70754019d7eaaf9acf82558f9be', '3ff755a5324b498c8aadb8e3c7ad158e',
+                    '068e51775f3a5004883047e71b972b8d', 'bab547ac31f6b5f7ea69f8bd0372241d',
+                    '657567c9502198f64045300e01eb7fbe', '7fe79b7a2ab9fba1183b7b163aeeb5e8',
+                    '58d87526bd4f43e9d5e8ceca8907ff91', '6eb13743271d0d3bc79757e4ec595a01',
+                    '0cd72ed91a20f9a0d258f02be9e5813d', 'a9a842e685b91b8aeb5f71ca25715ddb',
+                    '2f6b5c193b58da11ddbeb5192f0beeef', '381f86f9849c46c5dbfcb4bd17e8cffe',
+                    '3fd374e626c24edb3e2c89417ad18ea4', '53bc1d16a0185c92adad0bd77ec8b3b7',
+                    '1b17329658466254a51499c3cc1b5fb8', '0f9d19e62ed05bbc944e4db3488e3830',
+                    '0f9d19e62ed05bbc944e4db3488e3830', '95d2050d26eaa1b59e52f27732a5a441',
+                    'd0afd4bd96bf433a8420f87a9c5f4ea6', 'b805f3b8f56308e33aba7a2b2c2e9cae',
+                    '9287fd286636ebe5ccb2d4c9910f331c', 'e1635649a54cef4423cd05a8dfcfbeda',
+                    'aa57209322b579a50bb4cf9e7d4e1c92']
+            src = "https://e-cdns-images.dzcdn.net/images/cover/" + random.choice(imgs) + "/264x264-000000-80-0-0.jpg"
+            inpt.send_keys(src)
+            inpt.submit()
+            sleep(2)
+            return True
+        return False
+
     def visible(self, flag=True):
         if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
             self.browser.find_element_by_id('post-title-0').click()
@@ -270,7 +320,7 @@ class Ruswizard():
 
     def get_url(self, url="https://ruswizard.site/test/"):
         self.browser.get(url)
-        return True
+        return self.browser.title
 
     def log_out(self):
         if not self.authorized:
@@ -326,7 +376,7 @@ if __name__ == "__main__":
     test = Ruswizard()
     print(test.log_in("ya", "12345"))
     print(test.new_post())
-    print(test.set_time(2))
+    print(test.add_title())
     print(test.submit())
     print(test.log_out())
     del test
