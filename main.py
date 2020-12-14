@@ -41,6 +41,44 @@ class Ruswizard():
                                                     '"the-list")]//tr[contains(@id, "post-")]')
         return [post.text for post in posts]
 
+    def visible(self, flag=True):
+        if self.browser.title == 'Добавить запись ‹ Testing example — WordPress':
+            self.browser.find_element_by_id('post-title-0').click()
+            sleep(1)
+            xpath = '//button[contains(@class, "edit-post-post-visibility")]'
+            btn = self.browser.find_elements_by_xpath(xpath)
+            if not btn:
+                self.browser.find_element_by_xpath('//div[contains(@class, "interface-pinned-items")]'
+                                                   '//button[contains(@class, "has-icon")]').click()
+                btn = self.browser.find_elements_by_xpath(xpath)
+            btn[0].click()
+            if not flag:
+                self.browser.find_element_by_xpath('//input[contains(@id, "editor-post-private-")]').click()
+                sleep(1)
+                try:
+                    sleep(1)
+                    self.browser.switch_to.alert.accept()
+                    sleep(1)
+                except Exception:
+                    return False
+                xpath = '//a[contains(@class, "components-external-link")]'
+                url = self.browser.find_elements_by_xpath(xpath)
+                if not url:
+                    _xpath = '//div[contains(@class, "components-panel__body")]' \
+                        '//h2[contains(@class, "components-panel__body-title")]' \
+                        '//button[contains(@class, "components-panel__body-toggle")]'
+                    self.browser.find_elements_by_xpath(_xpath)[0].click()
+                    self.browser.find_elements_by_xpath(_xpath)[1].click()
+                    url = self.browser.find_elements_by_xpath(xpath)
+                self.get_url(url[1].text.split('\n')[0])
+                return self.browser.current_url
+            else:
+                self.browser.find_element_by_xpath('//input[contains(@id, "editor-post-public-")]').click()
+            self.browser.find_element_by_xpath('//div[contains(@class, "interface-pinned-items")]'
+                                               '//button[contains(@class, "has-icon")]').click()
+            return True
+        return False
+
     def all_comments_page(self):
         if not self.authorized:
             return False
@@ -206,13 +244,14 @@ class Ruswizard():
         return True
 
     def __del__(self):
-        self.browser.close()
+        self.browser.quit()
 
 # if __name__ == "__main__":
 #     test = Ruswizard()
 #     print(test.log_in("ya", "12345"))
-#     print(test.edit_post())
-#     test.submit()
-#     sleep(100)
+#     print(test.new_post())
+#     print(test.visible(False))
+#     # print(test.submit())
+#     # sleep(100)
 #     print(test.log_out())
 #     del test
